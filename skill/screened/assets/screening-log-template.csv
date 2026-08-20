@@ -1,0 +1,1 @@
+record_id,decision,reason,criteria_hit,confidence,title,abstract_present,abstract,authors,year,journal,pmid,doi,source_format,source_file,missing_fields,identifier_status,reviewer,screened_at,notes,human_confirmed,screener,dup_flag,dup_of,dup_key
