@@ -102,6 +102,7 @@
     .prisma td:nth-child(2) { text-align: right; font-variant-numeric: tabular-nums; }
     .warnchip { border-color: var(--maybe); color: var(--maybe); }
     .subnav { display:flex; flex-wrap:wrap; gap:8px; margin: 8px 0 14px; }
+    #empty-state.hidden, #empty-hint.hidden { display: none; }
 
   </style>
 </head>
@@ -110,7 +111,7 @@
     <header class="top">
       <div class="brand">
         <h1>SCREENED</h1>
-        <p>Title/abstract screening worksheet · v0.2</p>
+        <p>Title/abstract screening worksheet · v0.2.1</p>
       </div>
       <div class="meta">
         Research ops, not care.<br>
@@ -152,13 +153,18 @@
           <button type="button" class="ghost" id="demo">Load synthetic demo</button>
           <label class="filebtn">Load progress JSON<input id="progfile" type="file" accept=".json,application/json"></label>
         </div>
-        <p class="hint">Demo papers are obviously fake (“sleep and caffeine”, marked [SYNTHETIC]), including two duplicate pairs and two borderline records for A/B disagreement. No patient data. Companion is for a few dozen records; use the Cursor skill for a full export.</p>
+        <p class="hint" id="empty-hint">Demo papers are obviously fake (“sleep and caffeine”, marked [SYNTHETIC]), including two duplicate pairs and two borderline records for A/B disagreement. No patient data. Companion is for a few dozen records; use the Cursor skill for a full export.</p>
+        <div id="empty-state" class="banner" style="margin-top:12px" role="status">
+          <strong>Nothing loaded yet.</strong>
+          First time? Click <strong>Load synthetic demo</strong> (offline <code>file://</code>, no network), then <strong>Start screening</strong>.
+          Or paste / load your own CSV. Include = retrieve full text — you still decide every row.
+        </div>
       </div>
 
       <div class="actions">
         <button type="button" id="start">Start screening</button>
       </div>
-      <p class="hint" id="setup-msg"></p>
+      <p class="hint" id="setup-msg">No records loaded yet — use <strong>Load synthetic demo</strong> to try offline, or paste/load your own CSV.</p>
     </section>
 
     <section id="screen" class="hidden">
@@ -241,8 +247,11 @@
     </section>
 
     <footer>
-      Screened v0.2 · MIT-licensed skill files · paid Polar listing is a packaged copy, not a clinical product.
-      EU AI Act Art. 50: the Cursor/Claude skill produces AI-assisted drafts; this static page does not.
+      Screened v0.2.1 · MIT skill files · research ops, not a medical device.
+      Optional packaged zip:
+      <a href="https://buy.polar.sh/polar_cl_bGBPHTpDvx1yZyV4B1U4RpaENrdNPAuSOA4wN0n0xZ0?utm_source=demo&amp;utm_medium=https&amp;utm_campaign=screened_v021">Polar 199 SEK</a>
+      · <a href="https://github.com/andreaslofberg/screened">GitHub</a>.
+      EU AI Act Art. 50: Cursor/Claude skill drafts screener A only; this static page calls no model.
     </footer>
   </div>
 
@@ -691,6 +700,13 @@
     render();
   }
 
+  function setEmptyState(show) {
+    var el = $("empty-state");
+    if (el) el.classList.toggle("hidden", !show);
+    var hint = $("empty-hint");
+    if (hint) hint.classList.toggle("hidden", !show);
+  }
+
   function setScreener(which) {
     saveDraft();
     state.screener = which;
@@ -1037,6 +1053,7 @@
     }).join("\n");
     $("paste").value = csv;
     $("setup-msg").textContent = "Loaded " + DEMO_RECORDS.length + " synthetic sleep/caffeine records (2 duplicate pairs, 2 borderline A/B cases, 1 title-only). No real PMIDs.";
+    setEmptyState(false);
   });
 
   $("file").addEventListener("change", function (ev) {
@@ -1055,6 +1072,7 @@
       try {
         applyProgress(JSON.parse(String(reader.result || "")));
         $("setup-msg").textContent = "Resumed from progress JSON (" + state.records.length + " records).";
+        setEmptyState(false);
       } catch (err) {
         $("setup-msg").textContent = "Could not read progress JSON: " + err.message;
       }
@@ -1071,7 +1089,8 @@
     }
     var recs = parsePaste($("paste").value);
     if (!recs.length) {
-      $("setup-msg").textContent = "No records parsed. Paste CSV with a title column, or Title:/Abstract: blocks.";
+      $("setup-msg").textContent = "No records parsed. Paste CSV with a title column, or Title:/Abstract: blocks — or click Load synthetic demo.";
+      setEmptyState(true);
       return;
     }
     recs.forEach(function (r) {
@@ -1090,6 +1109,7 @@
     state.screener = "A";
     persist();
     $("setup-msg").textContent = recs.length + " records, " + nDup + " flagged as duplicates (kept).";
+    setEmptyState(false);
     render();
   });
 
