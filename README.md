@@ -1,36 +1,9 @@
 # Screened
 
-**Title/abstract screening for systematic and scoping reviews.**
+**Title/abstract screening for systematic and scoping reviews.**  
 A Cursor/Claude skill plus a one-page static worksheet. Research ops, not care.
 
-v0.2.0 · MIT (files in this repo) · A paid packaged copy is listed on Polar.
-
-## Disclosures (read first)
-
-- **Research ops, not care.** Screened is for *research operations* — screening
-  bibliographic records against criteria you wrote. It is **not** a medical
-  device, **not** clinical decision support, and **not** for diagnosis or
-  treatment decisions. It does not give care or advice to anyone.
-- **AI drafts screener A only.** The Cursor/Claude skill produces
-  **AI-generated draft labels for screener A**. It will never generate an
-  independent screener B, and its output is a draft, not a determination.
-  A human reviewer must confirm every row (`human_confirmed=no` is written on
-  purpose). The static worksheet calls no model at all — its "keyword hints"
-  are plain string overlap. If you use skill drafts in a published review,
-  disclose that assistance in your methods (cf. EU AI Act Art. 50).
-- **Paid Polar listing.** A packaged copy of this release is sold as a paid
-  listing on Polar (199 SEK, one-time, Polar is Merchant of Record):
-  **[Buy Screened v0.2 on Polar](https://buy.polar.sh/polar_cl_bGBPHTpDvx1yZyV4B1U4RpaENrdNPAuSOA4wN0n0xZ0)**
-  Paying is optional convenience packaging and support — it grants no extra
-  rights beyond MIT and no clinical certification.
-- **MIT on the files.** Everything in this repository is MIT licensed (see
-  `LICENSE`). See `NOTICE.md` for the not-clinical / AI-vs-human / dual
-  screening notice.
-
-## Get it
-
-- Free: clone or download this repo (MIT).
-- Paid packaged zip (199 SEK, one-time): <https://buy.polar.sh/polar_cl_bGBPHTpDvx1yZyV4B1U4RpaENrdNPAuSOA4wN0n0xZ0>
+v0.2.1 · MIT (skill files) · Polar listing live at 199 SEK.
 
 ## What it is
 
@@ -82,6 +55,8 @@ The skill will refuse to emit a PMID or DOI that was not in the source file.
 
 ```
 README.md                 this file
+TRY.md                    offline try guide + disclosures
+CHANGELOG.md              version notes
 LICENSE                   MIT + note that the Polar listing is paid
 NOTICE.md                 not-clinical / AI vs human / dual screening
 companion/index.html      static worksheet (open as a file)
@@ -193,11 +168,11 @@ disagreements CSV, PRISMA markdown/CSV, progress JSON (resume), and includes RIS
 Later it can sit on Cloudflare Pages as a static site. This v0 does not require
 an account anywhere.
 
-## Polar listing copy
+## Polar listing copy (draft — not published)
 
 **Title:** Screened — dual-screener title/abstract logs (Cursor skill + offline worksheet)
 
-**Price:** 199 SEK one-time  
+**Price hypothesis:** $19 one-time  
 (Polar Starter has $0 listing / monthly fee; they take a per-sale cut as Merchant of Record.)
 
 **Three bullets**
@@ -210,7 +185,7 @@ an account anywhere.
 
 > This product includes an AI-assisted workflow (the Cursor/Claude skill). Screening labels produced by the skill are **AI-generated drafts** for screener A, not determinations, not medical advice, and not a systematic-review substitute. The skill will not generate an independent screener B from the same pass. Outputs must be reviewed by a human. The static worksheet does not call a model; its “keyword hints” are string overlap. If you use skill drafts in a published review, disclose that assistance in the methods. Screened is not a medical device and must not be used for diagnosis or treatment decisions. PRISMA-style output is a counts table, not a certified flow diagram.
 
-**What Polar delivers:** a zip of this folder (see `pack-for-polar.sh`). File download, not a SaaS seat.
+**What Polar would deliver:** a zip of this folder (see `pack-for-polar.sh`). File download, not a SaaS seat.
 
 ## Limits of v0.2 (honest)
 
@@ -222,4 +197,4 @@ an account anywhere.
 
 ## License
 
-MIT for the files. The Polar listing is a **paid packaged copy**, not extra rights and not clinical certification. See `LICENSE`.
+MIT for the files. A future Polar listing is a **paid packaged copy**, not extra rights and not clinical certification. See `LICENSE`.
