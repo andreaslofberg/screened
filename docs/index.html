@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Screened — title/abstract worksheet</title>
+  <meta name="description" content="Offline title/abstract screening worksheet. Dual screeners, PRISMA counts, disagreements. Not clinical advice. Human decides.">
+  <style>
+    :root {
+      --paper: #f3efe4;
+      --ink: #1c1814;
+      --muted: #6b645a;
+      --rule: #ddd4c4;
+      --card: #faf7ef;
+      --include: #2a6b4f;
+      --maybe: #8a6424;
+      --exclude: #8b3a32;
+      --stamp: #1f4d5c;
+      --focus: #1f4d5c;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      line-height: 1.45;
+    }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 28px 20px 80px; }
+    header.top {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      gap: 16px; border-bottom: 2px solid var(--ink); padding-bottom: 12px;
+    }
+    .brand { font-family: "Iowan Old Style", Palatino, "Palatino Linotype", "Times New Roman", serif; }
+    .brand h1 { font-size: 34px; letter-spacing: 0.08em; margin: 0; font-weight: 700; }
+    .brand p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+    .meta { text-align: right; font-size: 12px; color: var(--muted); }
+    .banner {
+      margin: 14px 0 22px;
+      padding: 10px 12px;
+      border: 1px solid var(--ink);
+      background: #efe6d4;
+      font-size: 13px;
+    }
+    h2 { font-size: 15px; letter-spacing: 0.12em; text-transform: uppercase; margin: 0 0 8px; }
+    label { display: block; font-size: 13px; color: var(--muted); margin: 10px 0 4px; }
+    textarea, input[type="text"] {
+      width: 100%;
+      font: inherit;
+      background: var(--card);
+      color: var(--ink);
+      border: 1px solid var(--rule);
+      padding: 10px 12px;
+      border-radius: 2px;
+    }
+    textarea:focus, input[type="text"]:focus { outline: 2px solid var(--focus); outline-offset: 1px; }
+    textarea { min-height: 120px; resize: vertical; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 700px) { .row { grid-template-columns: 1fr; } header.top { flex-direction: column; align-items: flex-start; } .meta { text-align: left; } }
+    .panel { background: var(--card); border: 1px solid var(--rule); padding: 16px; margin-bottom: 16px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    button, .filebtn {
+      font: inherit; font-size: 14px; cursor: pointer;
+      border: 1px solid var(--ink); background: var(--ink); color: var(--paper);
+      padding: 8px 12px; border-radius: 2px;
+    }
+    button.ghost, .filebtn {
+      background: transparent; color: var(--ink);
+    }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+    button.include { background: var(--include); border-color: var(--include); color: #f4faf6; }
+    button.maybe { background: var(--maybe); border-color: var(--maybe); color: #fff8ea; }
+    button.exclude { background: var(--exclude); border-color: var(--exclude); color: #fdf4f3; }
+    .filebtn input { display: none; }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+    .kicker { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--stamp); }
+    .title { font-family: "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, serif; font-size: 22px; margin: 6px 0 10px; }
+    .abstract { white-space: pre-wrap; font-size: 15px; }
+    .missing { color: var(--exclude); font-size: 13px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+    .chip { font-size: 11px; border: 1px solid var(--rule); padding: 2px 7px; border-radius: 99px; color: var(--muted); }
+    .chip.on { border-color: var(--stamp); color: var(--stamp); }
+    .progress { height: 6px; background: var(--rule); margin: 10px 0 16px; }
+    .progress > span { display: block; height: 100%; background: var(--stamp); width: 0%; }
+    .status { font-size: 13px; color: var(--muted); }
+    .keys { font-size: 12px; color: var(--muted); }
+    kbd { font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; border: 1px solid var(--rule); padding: 0 4px; background: #fff; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+    .dec-include { color: var(--include); font-weight: 600; }
+    .dec-maybe { color: var(--maybe); font-weight: 600; }
+    .dec-exclude { color: var(--exclude); font-weight: 600; }
+    footer { margin-top: 28px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 12px; }
+    .hidden { display: none; }
+    .counts { display: flex; flex-wrap: wrap; gap: 16px; font-size: 14px; margin: 8px 0 14px; }
+
+    .tog { display:flex; flex-wrap:wrap; gap:0; margin: 8px 0 12px; }
+    .tog button { border-radius:0; }
+    .tog button.on { background: var(--stamp); border-color: var(--stamp); color: #f4faf6; }
+    .blind { font-size: 12px; color: var(--stamp); margin: 0 0 8px; }
+    .prisma { width: auto; min-width: 60%; }
+    .prisma td:nth-child(2) { text-align: right; font-variant-numeric: tabular-nums; }
+    .warnchip { border-color: var(--maybe); color: var(--maybe); }
+    .subnav { display:flex; flex-wrap:wrap; gap:8px; margin: 8px 0 14px; }
+    #empty-state.hidden, #empty-hint.hidden { display: none; }
+
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand">
+        <h1>SCREENED</h1>
+        <p>Title/abstract screening worksheet · v0.2.1</p>
+      </div>
+      <div class="meta">
+        Research ops, not care.<br>
+        No server · works as <code>file://</code><br>
+        Dual screeners · human decides.
+      </div>
+    </header>
+
+    <div class="banner">
+      <strong>Not clinical advice.</strong>
+      This page does not diagnose, treat, or recommend care.
+      Keyword hints are phrase overlap, not a model and not a determination.
+      Screener A and B are independent — the other person’s labels stay hidden while you work.
+      Identifiers are never invented — missing PMIDs stay missing. Duplicates are flagged, not dropped.
+    </div>
+
+    <section id="setup">
+      <div class="panel">
+        <h2>1. Criteria</h2>
+        <div class="row">
+          <div>
+            <label for="inc">Inclusion (one criterion per line)</label>
+            <textarea id="inc" placeholder="Human participants&#10;Caffeine exposure&#10;Sleep outcome"></textarea>
+          </div>
+          <div>
+            <label for="exc">Exclusion (one criterion per line)</label>
+            <textarea id="exc" placeholder="Animals or in vitro&#10;No sleep outcome&#10;Protocol without results"></textarea>
+          </div>
+        </div>
+        <p class="hint">Copied into the log as your protocol. The worksheet does not “understand” medicine — it helps you apply <em>your</em> rules.</p>
+      </div>
+
+      <div class="panel">
+        <h2>2. Records</h2>
+        <label for="paste">Paste CSV (with header) or Title:/Abstract: blocks, separated by ---</label>
+        <textarea id="paste" placeholder="id,title,abstract&#10;SYN-001,Example title,Example abstract"></textarea>
+        <div class="actions">
+          <label class="filebtn">Load CSV file<input id="file" type="file" accept=".csv,.txt,.tsv,.json,text/csv,application/json"></label>
+          <button type="button" class="ghost" id="demo">Load synthetic demo</button>
+          <label class="filebtn">Load progress JSON<input id="progfile" type="file" accept=".json,application/json"></label>
+        </div>
+        <p class="hint" id="empty-hint">Demo papers are obviously fake (“sleep and caffeine”, marked [SYNTHETIC]), including two duplicate pairs and two borderline records for A/B disagreement. No patient data. Companion is for a few dozen records; use the Cursor skill for a full export.</p>
+        <div id="empty-state" class="banner" style="margin-top:12px" role="status">
+          <strong>Nothing loaded yet.</strong>
+          First time? Click <strong>Load synthetic demo</strong> (offline <code>file://</code>, no network), then <strong>Start screening</strong>.
+          Or paste / load your own CSV. Include = retrieve full text — you still decide every row.
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" id="start">Start screening</button>
+      </div>
+      <p class="hint" id="setup-msg">No records loaded yet — use <strong>Load synthetic demo</strong> to try offline, or paste/load your own CSV.</p>
+    </section>
+
+    <section id="screen" class="hidden">
+      <div class="tog" role="group" aria-label="Active screener">
+        <button type="button" id="scr-a">Screener A</button>
+        <button type="button" id="scr-b">Screener B</button>
+        <button type="button" class="ghost" id="btn-logview">Counts / disagreements</button>
+      </div>
+      <p class="blind" id="blind"></p>
+      <div class="progress" aria-hidden="true"><span id="bar"></span></div>
+      <div class="status" id="status"></div>
+      <div class="panel" style="margin-top:12px">
+        <div class="kicker" id="kicker"></div>
+        <div class="title" id="rtitle"></div>
+        <div class="chips" id="meta"></div>
+        <div class="abstract" id="rabs"></div>
+        <div id="hintbox" class="hint" style="margin-top:12px"></div>
+      </div>
+      <div class="panel">
+        <label for="reason">One-line reason (required)</label>
+        <input id="reason" type="text" maxlength="240" placeholder="e.g. exclude: animal EEG (mice); exclusion = non-human">
+        <div class="actions">
+          <button type="button" class="include" id="btn-include">Include <kbd>1</kbd></button>
+          <button type="button" class="maybe" id="btn-maybe">Maybe <kbd>2</kbd></button>
+          <button type="button" class="exclude" id="btn-exclude">Exclude <kbd>3</kbd></button>
+          <button type="button" class="ghost" id="btn-prev">Prev</button>
+          <button type="button" class="ghost" id="btn-skip">Skip</button>
+        </div>
+        <p class="keys">Include = retrieve full text, not a final include. When unsure, Maybe. <kbd>j</kbd>/<kbd>k</kbd> next/prev. Active screener only — the other log is not shown.</p>
+      </div>
+    </section>
+
+    <section id="done" class="hidden">
+      <div class="panel">
+        <h2>PRISMA-style counts</h2>
+        <p class="hint">A counts table, not a flow-diagram drawing. Duplicates are flagged, not removed, so <em>identified</em> is not reduced.</p>
+        <div style="overflow-x:auto">
+          <table class="prisma">
+            <thead><tr><th>Stage</th><th>N</th><th>Note</th></tr></thead>
+            <tbody id="prisma-body"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Disagreements + unresolved maybes</h2>
+        <p class="hint" id="dis-hint"></p>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr><th>ID</th><th>Type</th><th>A</th><th>B</th><th>Reason A</th><th>Reason B</th><th>Title</th></tr>
+            </thead>
+            <tbody id="dis-body"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Both logs</h2>
+        <div class="counts" id="counts"></div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr><th>#</th><th>A</th><th>B</th><th>Dup</th><th>Title</th><th>PMID</th></tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+        <div class="actions">
+          <button type="button" id="dl-a">Download log A</button>
+          <button type="button" id="dl-b">Download log B</button>
+          <button type="button" id="dl-dis">Download disagreements</button>
+          <button type="button" class="ghost" id="dl-prisma">Download PRISMA md</button>
+          <button type="button" class="ghost" id="dl-prisma-csv">Download PRISMA csv</button>
+          <button type="button" class="ghost" id="dl-ris">Download includes.ris</button>
+          <button type="button" class="ghost" id="dl-prog">Download progress JSON</button>
+          <button type="button" class="ghost" id="back">Back to screening</button>
+          <button type="button" class="ghost" id="reset">Reset</button>
+        </div>
+        <p class="hint">Rows are written with <code>human_confirmed=no</code>. Dual independent screening is still the methods standard. This companion did not call a model. RIS export is Zotero-readable includes (both-A-and-B when both have labelled include).</p>
+      </div>
+    </section>
+
+    <footer>
+      Screened v0.2.1 · MIT skill files · research ops, not a medical device.
+      Optional packaged zip:
+      <a href="https://buy.polar.sh/polar_cl_bGBPHTpDvx1yZyV4B1U4RpaENrdNPAuSOA4wN0n0xZ0?utm_source=demo&amp;utm_medium=https&amp;utm_campaign=screened_v021">Polar 199 SEK</a>
+      · <a href="https://github.com/andreaslofberg/screened">GitHub</a>.
+      EU AI Act Art. 50: Cursor/Claude skill drafts screener A only; this static page calls no model.
+    </footer>
+  </div>
+
+<script>
+(function () {
+  "use strict";
+
+  var STOP = { a:1, an:1, the:1, of:1, and:1, or:1, to:1, in:1, for:1, with:1, on:1, by:1, from:1, at:1, as:1, is:1, are:1, be:1, this:1, that:1, study:1, studies:1, effect:1, effects:1, using:1, based:1, among:1, into:1, than:1, yes:1, both:1, only:1, least:1, one:1 };
+  var NEG = { no:1, not:1, without:1, non:1, nor:1 };
+  var MISSING = "MISSING";
+  var COLUMNS = ["record_id","decision","reason","criteria_hit","confidence","title","abstract_present","abstract","authors","year","journal","pmid","doi","source_format","source_file","missing_fields","identifier_status","reviewer","screened_at","notes","human_confirmed","screener","dup_flag","dup_of","dup_key"];
+  var LS_KEY = "screened.v0.2.progress";
+
+  var DEMO_INC = "Human participants\nCaffeine or caffeinated beverage/gum as an exposure\nAt least one sleep outcome (latency, duration, efficiency, quality, PSG, actigraphy, diary)";
+  var DEMO_EXC = "Animal or in vitro only\nNo sleep outcome\nProtocols, planned studies, or methods papers without results\nNarrative or systematic reviews (no primary data)";
+  var DEMO_RECORDS = [
+  {
+    "record_id": "SYN-001",
+    "title": "[SYNTHETIC] Delayed sleep onset after 3pm caffeine capsules in healthy adults: a 14-night lab experiment",
+    "authors": "Fictional, Ada; Madeup, Lin",
+    "year": "2024",
+    "journal": "Journal of Imaginary Sleep Research",
+    "pmid": "",
+    "doi": "10.0000/synthetic.screened.001",
+    "abstract": "SYNTHETIC RECORD — not a real study. Forty-eight healthy adult volunteers (ages 22–45) were randomised to 200 mg caffeine capsules or placebo at 15:00. Polysomnography and sleep diaries measured sleep latency and total sleep time. The caffeine arm showed longer sleep latency the same night. No clinical recommendations are made. All names, numbers, and findings are invented for software demonstration. Invented DOI 10.0000/synthetic.screened.001 (not a real registrant)."
+  },
+  {
+    "record_id": "SYN-002",
+    "title": "[SYNTHETIC] Interior lighting palettes of independent coffee shops: a narrative design review",
+    "authors": "Mock, Jules",
+    "year": "2023",
+    "journal": "Fictional Interiors Quarterly",
+    "pmid": "",
+    "doi": "",
+    "abstract": "SYNTHETIC RECORD — not a real study. This narrative review catalogues pendant lamps and wood finishes in twenty imagined cafés. No human participants, no caffeine dosing, and no sleep outcomes are reported. Included to test off-topic exclusion."
+  },
+  {
+    "record_id": "SYN-003",
+    "title": "[SYNTHETIC] Caffeine injection and EEG sleep architecture in laboratory mice",
+    "authors": "Placeholder, Kai; Demo, Noor",
+    "year": "2022",
+    "journal": "Made-up Comparative Neurophysiology",
+    "pmid": "",
+    "doi": "",
+    "abstract": "SYNTHETIC RECORD — not a real study. Adult C57BL/6 mice received intraperitoneal caffeine or saline. EEG/EMG quantified NREM and REM time. Animal model only; no human data. Included to test the non-human exclusion rule."
+  },
+  {
+    "record_id": "SYN-004",
+    "title": "[SYNTHETIC] Protocol: afternoon espresso versus decaf on overnight PSG in nurses — a planned RCT",
+    "authors": "Sample, Rio; Fake, Samira",
+    "year": "2025",
+    "journal": "Imaginary Trials Register",
+    "pmid": "",
+    "doi": "",
+    "abstract": "SYNTHETIC RECORD — not a real study. This is a protocol for a trial that has not enrolled anyone. Planned n=80 hospital nurses, espresso vs decaf at 16:00, overnight PSG primary endpoint. No results. Included to test protocol-without-results exclusion."
+  },
+  {
+    "record_id": "SYN-005",
+    "title": "[SYNTHETIC] Caffeine gum versus placebo: next-morning sleep diary and PVT in twelve night-shift nurses",
+    "authors": "Toydata, Elise; Fabricated, Omar",
+    "year": "2021",
+    "journal": "Pretend Occupational Sleep Letters",
+    "pmid": "",
+    "doi": "",
+    "abstract": "SYNTHETIC RECORD — not a real study. Twelve night-shift nurses chewed 100 mg caffeine gum or placebo at 01:00. A sleep diary and a 5-minute psychomotor vigilance test were collected after the subsequent daytime sleep opportunity. Tiny n, primary human data, sleep outcome present. Included to test include-vs-maybe on small samples (criteria do not exclude on sample size)."
+  },
+  {
+    "record_id": "SYN-006",
+    "title": "[SYNTHETIC] Delayed sleep onset after 3pm caffeine capsules in healthy adults: a 14-night laboratory experiment",
+    "authors": "Madeup, Lin; Fictional, Ada",
+    "year": "2024",
+    "journal": "Journal of Imaginary Sleep Research",
+    "pmid": "",
+    "doi": "10.0000/synthetic.screened.001",
+    "abstract": "SYNTHETIC RECORD — not a real study. DUPLICATE of SYN-001 for software dedup testing (same invented DOI 10.0000/synthetic.screened.001; title says laboratory instead of lab). Forty-eight healthy adult volunteers, 200 mg caffeine vs placebo at 15:00, PSG and diaries. Not a second experiment."
+  },
+  {
+    "record_id": "SYN-007",
+    "title": "[SYNTHETIC] Afternoon filter coffee and overnight actigraphy in office workers: a 10-day crossover",
+    "authors": "Dummy, Pia; Invented, Sol",
+    "year": "2020",
+    "journal": "Fabricated Chronobiology Notes",
+    "pmid": "",
+    "doi": "10.0000/synthetic.screened.007",
+    "abstract": "SYNTHETIC RECORD — not a real study. Thirty-six imagined office workers completed a 10-day crossover of two cups of filter coffee versus decaf at 15:00. Wrist actigraphy measured sleep efficiency and total sleep time. Primary human data, caffeine exposure, sleep outcome. Invented DOI 10.0000/synthetic.screened.007."
+  },
+  {
+    "record_id": "SYN-008",
+    "title": "[SYNTHETIC] Caffeine and sleep in adults: a field study",
+    "authors": "Blankabstract, Nia",
+    "year": "2019",
+    "journal": "Pretend Field Methods",
+    "pmid": "",
+    "doi": "",
+    "abstract": ""
+  },
+  {
+    "record_id": "SYN-009",
+    "title": "[SYNTHETIC] Energy drinks at lunch and self-reported bedtime in high-school students",
+    "authors": "Ambiguous, Tess; Edgecase, Bo",
+    "year": "2023",
+    "journal": "Hypothetical Adolescent Health Letters",
+    "pmid": "",
+    "doi": "",
+    "abstract": "SYNTHETIC RECORD — not a real study. A questionnaire of 90 imagined 15–17 year olds asked whether they drank a branded energy drink at lunch and what time they “usually went to bed”. No PSG, actigraphy, or sleep diary instrument. Caffeine dose not measured. Age and outcome are deliberately borderline against typical adult + sleep-outcome criteria. Included to provoke screener A/B disagreement. No patient data."
+  },
+  {
+    "record_id": "SYN-010",
+    "title": "[SYNTHETIC] Matcha service and evening restfulness among café staff: a one-week mood survey",
+    "authors": "Greyarea, Will",
+    "year": "2022",
+    "journal": "Made-up Occupational Mood Digest",
+    "pmid": "",
+    "doi": "",
+    "abstract": "SYNTHETIC RECORD — not a real study. Eight imagined baristas rated “restfulness” on a smiley scale after drinking house matcha. Caffeine content was not measured. No sleep latency, duration, efficiency, PSG, actigraphy, or diary. Included to provoke screener A/B disagreement (tea/caffeine-ish vs no sleep outcome)."
+  },
+  {
+    "record_id": "SYN-011",
+    "title": "[SYNTHETIC] Caffeine superfusion and firing rates in guinea-pig hippocampal slices",
+    "authors": "Vitro, Cam; Slice, Ren",
+    "year": "2018",
+    "journal": "Imaginary Cellular Neuro Notes",
+    "pmid": "",
+    "doi": "",
+    "abstract": "SYNTHETIC RECORD — not a real study. In vitro electrophysiology on guinea-pig hippocampal slices. Caffeine was washed over the bath; firing rates were recorded. No behaving animals, no humans, no sleep. Included to test the in-vitro / non-human exclusion."
+  },
+  {
+    "record_id": "SYN-012",
+    "title": "[SYNTHETIC] Afternoon filter coffee and overnight actigraphy in office workers: a 10-day crossover.",
+    "authors": "Invented, Sol; Dummy, Pia",
+    "year": "2020",
+    "journal": "Fabricated Chronobiology Notes",
+    "pmid": "",
+    "doi": "",
+    "abstract": "SYNTHETIC RECORD — not a real study. DUPLICATE of SYN-007 for title-normalization testing (trailing period; no DOI on this copy). Same invented 10-day coffee vs decaf actigraphy crossover. Not a second experiment."
+  }
+];
+
+  var state = { records: [], index: 0, incP: [], excP: [], screener: "A", logs: { A: {}, B: {} }, incText: "", excText: "" };
+
+  function $(id) { return document.getElementById(id); }
+  function show(id) {
+    $("setup").classList.add("hidden");
+    $("screen").classList.add("hidden");
+    $("done").classList.add("hidden");
+    $(id).classList.remove("hidden");
+  }
+  function norm(s) {
+    return String(s || "").toLowerCase().replace(/[^a-z0-9\s-]/g, " ").replace(/\s+/g, " ").trim();
+  }
+  function titleNorm(s) {
+    return String(s || "").toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
+  }
+  function phrases(text) {
+    var out = [], seen = {};
+    String(text || "").split(/[\n;]+/).forEach(function (raw) {
+      raw = raw.replace(/^[\-\*\d\.\)\]]+\s*/, "").trim();
+      if (/\bor\b/i.test(raw)) raw = raw.replace(/\s*,\s*/g, " or ");
+      raw.split(/\s+or\s+/i).forEach(function (part) {
+        var words = norm(part).split(" ").filter(Boolean);
+        while (words.length && STOP[words[0]] && !NEG[words[0]]) words.shift();
+        var p = words.join(" ");
+        if (p.length >= 4 && !seen[p]) { seen[p] = 1; out.push(p); }
+      });
+    });
+    return out;
+  }
+  function hits(hay, list) {
+    return list.filter(function (p) {
+      if (!p) return false;
+      if (hay.indexOf(p) !== -1) return true;
+      return p.indexOf(" ") === -1 && p.length >= 5 && p.charAt(p.length-1) === "s" && hay.indexOf(p.slice(0,-1)) !== -1;
+    });
+  }
+  function hintOf(rec) {
+    var hay = norm(rec.title + " " + rec.abstract);
+    var ih = hits(hay, state.incP);
+    var eh = hits(hay, state.excP);
+    var suggestion, why;
+    if (eh.length && !ih.length) { suggestion = "exclude"; why = "exclude-phrase match, no include-phrase match"; }
+    else if (ih.length && !eh.length) { suggestion = "include"; why = "include-phrase match, no exclude-phrase match"; }
+    else if (ih.length && eh.length) { suggestion = "maybe"; why = "both include and exclude phrases matched"; }
+    else { suggestion = "maybe"; why = "no phrase overlap"; }
+    return { suggestion: suggestion, why: why, include_hits: ih, exclude_hits: eh };
+  }
+  function flag(v) {
+    v = String(v || "").trim();
+    return v ? v : MISSING;
+  }
+  function pmidOf(raw) {
+    raw = String(raw || "").replace(/^pmid[:\s]*/i, "").replace(/,/g, "").trim();
+    if (/^\d{1,8}$/.test(raw)) return raw;
+    return "";
+  }
+  function doiOf(raw) {
+    raw = String(raw || "").replace(/^(doi:|https?:\/\/(dx\.)?doi\.org\/)/i, "").trim().replace(/\.$/, "");
+    if (/^10\.\d{4,9}\/\S+$/i.test(raw)) return raw;
+    return "";
+  }
+  function finish(raw, index, sourceFormat) {
+    var title = String(raw.title || "").trim();
+    var abs = String(raw.abstract || "").trim();
+    var pmid = pmidOf(raw.pmid);
+    var doi = doiOf(raw.doi);
+    var id = String(raw.record_id || raw.id || "").trim();
+    if (!id || /^\d{1,8}$/.test(id)) {
+      id = pmid ? ("pmid-" + pmid) : (doi ? ("doi-" + doi.replace(/[^A-Za-z0-9._-]+/g, "-").slice(0, 80)) : ("local-" + String(index).padStart(3, "0")));
+    }
+    var rec = {
+      record_id: id,
+      title: flag(title),
+      title_normalized: titleNorm(title),
+      abstract: flag(abs),
+      abstract_present: abs ? "yes" : "no",
+      authors: flag(raw.authors),
+      year: flag(String(raw.year || "").match(/\b(?:19|20)\d{2}\b/) ? String(raw.year).match(/\b(?:19|20)\d{2}\b/)[0] : ""),
+      journal: flag(raw.journal),
+      pmid: flag(pmid),
+      doi: flag(doi),
+      source_format: sourceFormat,
+      source_file: raw.source_file || "worksheet",
+      dup_flag: "no",
+      dup_of: "",
+      dup_key: ""
+    };
+    var miss = [];
+    ["title","abstract","authors","year","pmid","doi"].forEach(function (k) { if (rec[k] === MISSING) miss.push(k === "abstract" ? "abstract" : k); });
+    rec.missing_fields = miss.join(";");
+    rec.identifier_status = (rec.pmid !== MISSING && rec.doi !== MISSING) ? "as-supplied" : (rec.pmid === MISSING && rec.doi === MISSING) ? "no-identifiers" : (rec.pmid === MISSING ? "no-pmid" : "no-doi");
+    return rec;
+  }
+
+  function flagDups(recs) {
+    var n = recs.length;
+    var parent = [];
+    var i;
+    for (i = 0; i < n; i++) parent[i] = i;
+    function find(x) { while (parent[x] !== x) { parent[x] = parent[parent[x]]; x = parent[x]; } return x; }
+    function union(a, b) { var ra = find(a), rb = find(b); if (ra !== rb) parent[rb] = ra; }
+    var buckets = {};
+    recs.forEach(function (r, idx) {
+      r.title_normalized = titleNorm(r.title === MISSING ? "" : r.title);
+      function add(kind, val) {
+        if (!val || val === MISSING) return;
+        if (kind === "title" && val.length < 12) return;
+        var k = kind + ":" + (kind === "doi" ? String(val).toLowerCase() : val);
+        (buckets[k] = buckets[k] || []).push(idx);
+      }
+      add("doi", r.doi);
+      add("pmid", r.pmid);
+      add("title", r.title_normalized);
+    });
+    Object.keys(buckets).forEach(function (k) {
+      var idxs = buckets[k];
+      if (idxs.length < 2) return;
+      for (var j = 1; j < idxs.length; j++) union(idxs[0], idxs[j]);
+    });
+    var clusters = {};
+    for (i = 0; i < n; i++) {
+      var root = find(i);
+      (clusters[root] = clusters[root] || []).push(i);
+    }
+    Object.keys(clusters).forEach(function (root) {
+      var members = clusters[root];
+      members.sort(function (a, b) { return a - b; });
+      if (members.length === 1) {
+        recs[members[0]].dup_flag = "no";
+        recs[members[0]].dup_of = "";
+        recs[members[0]].dup_key = "";
+        return;
+      }
+      var c = recs[members[0]];
+      var o = recs[members[1]];
+      var key = "";
+      if (c.doi !== MISSING && o.doi !== MISSING && String(c.doi).toLowerCase() === String(o.doi).toLowerCase()) key = "doi:" + String(c.doi).toLowerCase();
+      else if (c.pmid !== MISSING && o.pmid !== MISSING && c.pmid === o.pmid) key = "pmid:" + c.pmid;
+      else key = "title:" + (c.title_normalized || "").slice(0, 80);
+      members.forEach(function (mi) {
+        recs[mi].dup_flag = "yes";
+        recs[mi].dup_of = c.record_id;
+        recs[mi].dup_key = key;
+      });
+    });
+  }
+
+  function parseCSV(text) {
+    var rows = [];
+    var i = 0, field = "", row = [], inQ = false;
+    function endField() { row.push(field); field = ""; }
+    function endRow() {
+      if (row.length === 1 && row[0] === "") { row = []; return; }
+      rows.push(row); row = [];
+    }
+    text = text.replace(/^\ufeff/, "");
+    while (i < text.length) {
+      var c = text[i];
+      if (inQ) {
+        if (c === '"') {
+          if (text[i + 1] === '"') { field += '"'; i += 2; continue; }
+          inQ = false; i++; continue;
+        }
+        field += c; i++; continue;
+      }
+      if (c === '"') { inQ = true; i++; continue; }
+      if (c === "," || c === "\t" || c === ";") { endField(); i++; continue; }
+      if (c === "\n") { endField(); endRow(); i++; continue; }
+      if (c === "\r") { i++; continue; }
+      field += c; i++;
+    }
+    if (field.length || row.length) { endField(); endRow(); }
+    if (!rows.length) return [];
+    var headers = rows[0].map(function (h) { return h.trim().toLowerCase().replace(/[\s_]+/g, " "); });
+    var alias = {
+      title: ["title","ti","article title","item title"],
+      abstract: ["abstract","ab","abstract note","summary"],
+      authors: ["authors","author","au","first author"],
+      year: ["year","publication year","py"],
+      pmid: ["pmid","pubmed id","pubmedid","accession number"],
+      doi: ["doi"],
+      record_id: ["id","record id","record_id","key","item key"],
+      journal: ["journal","journal/book","publication title","source"]
+    };
+    function col(name) {
+      var list = alias[name];
+      for (var a = 0; a < list.length; a++) {
+        var idx = headers.indexOf(list[a]);
+        if (idx !== -1) return idx;
+      }
+      return -1;
+    }
+    var idx = {};
+    Object.keys(alias).forEach(function (k) { idx[k] = col(k); });
+    var out = [];
+    for (var r = 1; r < rows.length; r++) {
+      var cells = rows[r];
+      if (!cells.join("").trim()) continue;
+      function g(k) { return idx[k] >= 0 ? (cells[idx[k]] || "") : ""; }
+      out.push(finish({
+        record_id: g("record_id"),
+        title: g("title"),
+        abstract: g("abstract"),
+        authors: g("authors"),
+        year: g("year"),
+        pmid: g("pmid"),
+        doi: g("doi"),
+        journal: g("journal")
+      }, out.length + 1, "csv"));
+    }
+    return out;
+  }
+
+  function parsePaste(text) {
+    text = text.trim();
+    if (!text) return [];
+    var first = text.split(/\n/, 1)[0];
+    if (/title|abstract|pmid/i.test(first) && /[,;\t]/.test(first)) return parseCSV(text);
+    var chunks = text.split(/\n---+\s*\n/);
+    if (chunks.length === 1) {
+      var alt = text.split(/\n\s*\n\s*\n/);
+      if (alt.length > 1) chunks = alt;
+    }
+    var out = [];
+    chunks.forEach(function (chunk) {
+      chunk = chunk.trim();
+      if (!chunk) return;
+      var labelled = {};
+      chunk.split(/\n/).forEach(function (line) {
+        var m = line.match(/^(title|abstract|authors?|year|pmid|doi|id|journal)\s*[:=]\s*(.*)$/i);
+        if (m) labelled[m[1].toLowerCase()] = m[2];
+      });
+      var rec = {};
+      if (labelled.title || labelled.abstract) {
+        rec.title = labelled.title || "";
+        rec.abstract = labelled.abstract || "";
+        var am = chunk.match(/^abstract\s*[:=]\s*([\s\S]*)$/im);
+        if (am) rec.abstract = am[1].replace(/^(abstract\s*[:=]\s*)/i, "").trim();
+        rec.authors = labelled.authors || labelled.author || "";
+        rec.year = labelled.year || "";
+        rec.pmid = labelled.pmid || "";
+        rec.doi = labelled.doi || "";
+        rec.journal = labelled.journal || "";
+        rec.record_id = labelled.id || "";
+      } else {
+        var lines = chunk.split(/\n/).map(function (l) { return l.trim(); }).filter(Boolean);
+        rec.title = lines[0] || "";
+        rec.abstract = lines.slice(1).join(" ");
+      }
+      out.push(finish(rec, out.length + 1, "paste"));
+    });
+    return out;
+  }
+
+  function slot(screener, rid) {
+    return (state.logs[screener] || {})[rid] || null;
+  }
+  function labelledCount(screener) {
+    var n = 0;
+    state.records.forEach(function (r) {
+      var s = slot(screener, r.record_id);
+      if (s && s.decision) n++;
+    });
+    return n;
+  }
+  function current() { return state.records[state.index]; }
+
+  function saveDraft() {
+    var rec = current();
+    if (!rec) return;
+    var logs = state.logs[state.screener];
+    var cur = logs[rec.record_id] || {};
+    cur.reason_draft = $("reason").value;
+    logs[rec.record_id] = cur;
+  }
+
+  function persist() {
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify(progressPayload()));
+    } catch (e) {}
+  }
+
+  function progressPayload() {
+    return {
+      version: "0.2.0",
+      screener: state.screener,
+      criteria_inc: state.incText,
+      criteria_exc: state.excText,
+      records: state.records,
+      logs: state.logs,
+      index: state.index
+    };
+  }
+
+  function applyProgress(obj) {
+    if (!obj || !obj.records || !obj.records.length) throw new Error("progress JSON has no records");
+    state.records = obj.records;
+    state.logs = obj.logs && obj.logs.A && obj.logs.B ? obj.logs : { A: obj.logs && obj.logs.A || {}, B: obj.logs && obj.logs.B || {} };
+    state.screener = obj.screener === "B" ? "B" : "A";
+    state.incText = obj.criteria_inc || $("inc").value;
+    state.excText = obj.criteria_exc || $("exc").value;
+    $("inc").value = state.incText;
+    $("exc").value = state.excText;
+    state.incP = phrases(state.incText);
+    state.excP = phrases(state.excText);
+    state.index = Math.min(obj.index || 0, state.records.length - 1);
+    flagDups(state.records);
+    render();
+  }
+
+  function setEmptyState(show) {
+    var el = $("empty-state");
+    if (el) el.classList.toggle("hidden", !show);
+    var hint = $("empty-hint");
+    if (hint) hint.classList.toggle("hidden", !show);
+  }
+
+  function setScreener(which) {
+    saveDraft();
+    state.screener = which;
+    $("scr-a").classList.toggle("on", which === "A");
+    $("scr-b").classList.toggle("on", which === "B");
+    persist();
+    render();
+  }
+
+  function render() {
+    var rec = current();
+    if (!rec) { renderDone(); return; }
+    $("scr-a").classList.toggle("on", state.screener === "A");
+    $("scr-b").classList.toggle("on", state.screener === "B");
+    var n = state.records.length;
+    var doneA = labelledCount("A");
+    var doneB = labelledCount("B");
+    var done = state.screener === "A" ? doneA : doneB;
+    $("bar").style.width = Math.round((done / n) * 100) + "%";
+    $("status").textContent = "Screener " + state.screener + " · record " + (state.index + 1) + " of " + n + " · A " + doneA + "/" + n + " · B " + doneB + "/" + n + " · include = retrieve full text";
+    $("blind").textContent = "Blind mode: screener " + (state.screener === "A" ? "B" : "A") + "’s labels are hidden. Switch only after you have finished, or you are the other person.";
+    var kicker = rec.record_id + " · " + rec.source_format;
+    if (rec.dup_flag === "yes") kicker += " · duplicate of " + rec.dup_of + " (" + rec.dup_key + ")";
+    $("kicker").textContent = kicker;
+    $("rtitle").textContent = rec.title === MISSING ? "(title MISSING)" : rec.title;
+    var chips = [];
+    chips.push(rec.year);
+    chips.push(rec.authors);
+    chips.push(rec.journal);
+    chips.push("PMID " + rec.pmid);
+    chips.push("DOI " + rec.doi);
+    if (rec.abstract_present === "no") chips.push("abstract MISSING");
+    if (rec.dup_flag === "yes") chips.push("DUPLICATE of " + rec.dup_of);
+    $("meta").innerHTML = chips.filter(function (c) { return c && c !== MISSING && c !== "PMID MISSING" && c !== "DOI MISSING"; })
+      .concat(rec.pmid === MISSING ? ["PMID MISSING"] : [])
+      .concat(rec.doi === MISSING ? ["DOI MISSING"] : [])
+      .map(function (c) {
+        var extra = c.indexOf("DUPLICATE") === 0 ? " warnchip" : (c.indexOf("MISSING") >= 0 ? "" : " on");
+        return '<span class="chip' + extra + '">' + escapeHtml(c) + "</span>";
+      })
+      .join("");
+    if (rec.abstract_present === "no") {
+      $("rabs").innerHTML = '<p class="missing">Abstract MISSING. Default: Maybe unless the title is a clear mismatch. Do not invent the abstract.</p>';
+    } else {
+      $("rabs").textContent = rec.abstract;
+    }
+    var h = hintOf(rec);
+    rec._hint = h;
+    $("hintbox").innerHTML =
+      "<strong>Keyword hint (not a decision):</strong> " + h.suggestion + " — " + h.why +
+      (h.include_hits.length ? "<br>include phrases: " + escapeHtml(h.include_hits.join("; ")) : "") +
+      (h.exclude_hits.length ? "<br>exclude phrases: " + escapeHtml(h.exclude_hits.join("; ")) : "");
+    var mine = slot(state.screener, rec.record_id) || {};
+    $("reason").value = mine.reason || mine.reason_draft || suggestedReason(rec, h);
+    show("screen");
+  }
+
+  function suggestedReason(rec, h) {
+    if (rec.abstract_present === "no") return "title-only; abstract MISSING";
+    if (rec.dup_flag === "yes") {
+      /* still require a real decision; hint the dup in the reason if empty later */
+    }
+    if (h.suggestion === "exclude" && h.exclude_hits[0]) return "exclude: matched “" + h.exclude_hits[0] + "”";
+    if (h.suggestion === "include" && h.include_hits[0]) return "include: matched “" + h.include_hits[0] + "”; no exclusion hit";
+    if (h.include_hits[0] && h.exclude_hits[0]) return "maybe: both “" + h.include_hits[0] + "” and “" + h.exclude_hits[0] + "”";
+    return "";
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" })[c];
+    });
+  }
+
+  function decide(decision) {
+    var rec = current();
+    if (!rec) return;
+    var reason = $("reason").value.trim();
+    if (!reason) {
+      $("reason").focus();
+      $("reason").placeholder = "Reason required — one line, tied to a criterion";
+      return;
+    }
+    var h = rec._hint || hintOf(rec);
+    state.logs[state.screener][rec.record_id] = {
+      decision: decision,
+      reason: reason.slice(0, 240),
+      criteria_hit: (decision === "exclude" ? h.exclude_hits[0] : h.include_hits[0]) || "",
+      screened_at: new Date().toISOString(),
+      confidence: "low"
+    };
+    persist();
+    var next = -1;
+    for (var i = state.index + 1; i < state.records.length; i++) {
+      var s = slot(state.screener, state.records[i].record_id);
+      if (!s || !s.decision) { next = i; break; }
+    }
+    if (next === -1) for (var j = 0; j < state.records.length; j++) {
+      var s2 = slot(state.screener, state.records[j].record_id);
+      if (!s2 || !s2.decision) { next = j; break; }
+    }
+    if (next === -1) renderDone();
+    else { state.index = next; render(); }
+  }
+
+  function prismaItems() {
+    var recs = state.records;
+    var identified = recs.length;
+    var dupN = recs.filter(function (r) { return r.dup_flag === "yes"; }).length;
+    var clusters = {};
+    recs.forEach(function (r) { if (r.dup_flag === "yes") clusters[r.dup_of] = 1; });
+    function tally(scr) {
+      var c = { include:0, maybe:0, exclude:0, unlabelled:0 };
+      recs.forEach(function (r) {
+        var s = slot(scr, r.record_id);
+        var d = s && s.decision;
+        if (d && c[d] !== undefined) c[d]++; else c.unlabelled++;
+      });
+      c.screened = c.include + c.maybe + c.exclude;
+      return c;
+    }
+    var a = tally("A"), b = tally("B");
+    var bothInc = 0, bothExc = 0, conflict = 0, unresolved = 0, missing = 0;
+    recs.forEach(function (r) {
+      var da = (slot("A", r.record_id) || {}).decision || "";
+      var db = (slot("B", r.record_id) || {}).decision || "";
+      if (!da || !db) { missing++; return; }
+      if (da === "include" && db === "include") bothInc++;
+      else if (da === "exclude" && db === "exclude") bothExc++;
+      else if (da === "maybe" || db === "maybe") unresolved++;
+      else if (da !== db) conflict++;
+    });
+    var nAbs = recs.filter(function (r) { return r.abstract_present === "no"; }).length;
+    var nPmid = recs.filter(function (r) { return r.pmid === MISSING; }).length;
+    return [
+      ["identified", identified, "Parser records; nothing invented"],
+      ["duplicates flagged", dupN, "DOI/PMID/title matches — not dropped"],
+      ["duplicate clusters", Object.keys(clusters).length, "Canonical + copies"],
+      ["screened (both labelled)", identified - missing, "A and B both decided"],
+      ["included (both include)", bothInc, "Retrieve full text, not a final include"],
+      ["excluded (both exclude)", bothExc, "Title/abstract excludes"],
+      ["maybe / unresolved", unresolved + conflict + missing, "Maybes, conflicts, missing labels"],
+      ["A include / maybe / exclude", a.include + " / " + a.maybe + " / " + a.exclude, "Independent log A"],
+      ["B include / maybe / exclude", b.include + " / " + b.maybe + " / " + b.exclude, "Independent log B"],
+      ["conflicts (A ≠ B, neither maybe)", conflict, "Need consensus / third reviewer"],
+      ["unresolved maybe", unresolved, "Either or both maybe"],
+      ["missing A or B", missing, "Not yet labelled by one screener"],
+      ["abstract MISSING", nAbs, "Do not invent abstracts"],
+      ["pmid MISSING", nPmid, "Do not invent PMIDs"]
+    ];
+  }
+
+  function disagreementRows() {
+    var out = [];
+    state.records.forEach(function (r) {
+      var a = slot("A", r.record_id) || {};
+      var b = slot("B", r.record_id) || {};
+      var da = a.decision || "";
+      var db = b.decision || "";
+      var kind = null;
+      if (!da && !db) kind = "missing_both";
+      else if (!da) kind = "missing_a";
+      else if (!db) kind = "missing_b";
+      else if (da === "maybe" || db === "maybe") kind = "unresolved_maybe";
+      else if (da !== db) kind = "conflict";
+      if (!kind) return;
+      out.push({
+        record_id: r.record_id,
+        disagreement_type: kind,
+        decision_a: da,
+        decision_b: db,
+        reason_a: a.reason || "",
+        reason_b: b.reason || "",
+        title: r.title,
+        pmid: r.pmid,
+        doi: r.doi,
+        dup_flag: r.dup_flag,
+        dup_of: r.dup_of || ""
+      });
+    });
+    return out;
+  }
+
+  function renderDone() {
+    var items = prismaItems();
+    $("prisma-body").innerHTML = items.map(function (it) {
+      return "<tr><td>" + escapeHtml(it[0]) + "</td><td>" + escapeHtml(String(it[1])) + "</td><td>" + escapeHtml(it[2]) + "</td></tr>";
+    }).join("");
+    var dis = disagreementRows();
+    $("dis-hint").textContent = dis.length
+      ? (dis.length + " row(s) where A and B differ, a label is maybe, or a screener has not labelled. Agreeing include/exclude pairs are omitted.")
+      : "No disagreements yet (or neither screener has labelled). Unresolved maybes will appear here.";
+    $("dis-body").innerHTML = dis.map(function (d) {
+      return "<tr><td>" + escapeHtml(d.record_id) + "</td><td>" + escapeHtml(d.disagreement_type) + "</td><td class='dec-" + escapeHtml(d.decision_a) + "'>" +
+        escapeHtml(d.decision_a || "—") + "</td><td class='dec-" + escapeHtml(d.decision_b) + "'>" + escapeHtml(d.decision_b || "—") +
+        "</td><td>" + escapeHtml((d.reason_a || "").slice(0, 80)) + "</td><td>" + escapeHtml((d.reason_b || "").slice(0, 80)) +
+        "</td><td>" + escapeHtml(String(d.title).slice(0, 70)) + "</td></tr>";
+    }).join("");
+    var aN = labelledCount("A"), bN = labelledCount("B");
+    $("counts").innerHTML =
+      "<span>A labelled " + aN + "/" + state.records.length + "</span>" +
+      "<span>B labelled " + bN + "/" + state.records.length + "</span>" +
+      "<span>disagreements " + dis.length + "</span>";
+    $("tbody").innerHTML = state.records.map(function (r) {
+      var a = (slot("A", r.record_id) || {}).decision || "—";
+      var b = (slot("B", r.record_id) || {}).decision || "—";
+      return "<tr><td>" + escapeHtml(r.record_id) + "</td><td class='dec-" + escapeHtml(a) + "'>" + escapeHtml(a) +
+        "</td><td class='dec-" + escapeHtml(b) + "'>" + escapeHtml(b) + "</td><td>" +
+        (r.dup_flag === "yes" ? escapeHtml("yes → " + r.dup_of) : "") + "</td><td>" +
+        escapeHtml(String(r.title).slice(0, 80)) + "</td><td>" + escapeHtml(r.pmid) + "</td></tr>";
+    }).join("");
+    show("done");
+  }
+
+  function csvEscape(v) {
+    v = String(v == null ? "" : v);
+    if (/[",\n\r]/.test(v)) return '"' + v.replace(/"/g, '""') + '"';
+    return v;
+  }
+
+  function logRows(screener) {
+    var now = new Date().toISOString();
+    var lines = [COLUMNS.join(",")];
+    state.records.forEach(function (r) {
+      var s = slot(screener, r.record_id);
+      if (!s || !s.decision) return;
+      var row = {
+        record_id: r.record_id,
+        decision: s.decision,
+        reason: s.reason,
+        criteria_hit: s.criteria_hit || "",
+        confidence: s.confidence || "low",
+        title: r.title,
+        abstract_present: r.abstract_present,
+        abstract: r.abstract,
+        authors: r.authors,
+        year: r.year,
+        journal: r.journal,
+        pmid: r.pmid,
+        doi: r.doi,
+        source_format: r.source_format,
+        source_file: r.source_file,
+        missing_fields: r.missing_fields,
+        identifier_status: r.identifier_status,
+        reviewer: "screener-" + screener + " (human-worksheet)",
+        screened_at: s.screened_at || now,
+        notes: "companion; no model; keyword hints are not decisions" + (r.dup_flag === "yes" ? "; possible duplicate of " + r.dup_of : ""),
+        human_confirmed: "no",
+        screener: screener,
+        dup_flag: r.dup_flag || "no",
+        dup_of: r.dup_of || "",
+        dup_key: r.dup_key || ""
+      };
+      lines.push(COLUMNS.map(function (k) { return csvEscape(row[k]); }).join(","));
+    });
+    return lines.join("\r\n");
+  }
+
+  function downloadBlob(filename, text, mime) {
+    var blob = new Blob([text], { type: mime || "text/plain;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 500);
+  }
+
+  function downloadCSV(screener) {
+    downloadBlob("screening_log_" + screener.toLowerCase() + ".csv", logRows(screener), "text/csv;charset=utf-8");
+  }
+
+  function downloadDisagreements() {
+    var cols = ["record_id","disagreement_type","decision_a","decision_b","reason_a","reason_b","title","pmid","doi","dup_flag","dup_of"];
+    var lines = [cols.join(",")];
+    disagreementRows().forEach(function (d) {
+      lines.push(cols.map(function (k) { return csvEscape(d[k]); }).join(","));
+    });
+    downloadBlob("disagreements.csv", lines.join("\r\n"), "text/csv;charset=utf-8");
+  }
+
+  function downloadPrismaMd() {
+    var lines = ["# Screened — PRISMA-style title/abstract counts", "", "_Companion worksheet v0.2. Counts table, not a flow-diagram drawing._", "", "| Stage | N | Note |", "|---|---:|---|"];
+    prismaItems().forEach(function (it) {
+      lines.push("| " + it[0] + " | " + it[1] + " | " + it[2] + " |");
+    });
+    lines.push("", "Not clinical advice. include = retrieve full text. Human confirmation required. No PMIDs invented.", "");
+    downloadBlob("prisma_summary.md", lines.join("\n"), "text/markdown;charset=utf-8");
+  }
+
+  function downloadPrismaCsv() {
+    var lines = ["stage,n,note"];
+    prismaItems().forEach(function (it) {
+      lines.push([it[0], it[1], it[2]].map(csvEscape).join(","));
+    });
+    downloadBlob("prisma_counts.csv", lines.join("\r\n"), "text/csv;charset=utf-8");
+  }
+
+  function downloadProgress() {
+    downloadBlob("screened_progress.json", JSON.stringify(progressPayload(), null, 2), "application/json");
+  }
+
+  function risEscape(text) {
+    return String(text || "").replace(/\r\n|\r|\n/g, " ").trim();
+  }
+  function present(v) {
+    v = String(v || "").trim();
+    return (!v || v === MISSING) ? "" : v;
+  }
+  function downloadRIS() {
+    var blocks = [];
+    state.records.forEach(function (r) {
+      var da = (slot("A", r.record_id) || {}).decision;
+      var db = (slot("B", r.record_id) || {}).decision;
+      var ok = (da === "include" && db === "include") || (da === "include" && !db) || (db === "include" && !da);
+      // both include when both labelled; if only one screener has labelled includes, export that screener's includes
+      if (labelledCount("A") && labelledCount("B")) ok = (da === "include" && db === "include");
+      else ok = da === "include" || db === "include";
+      if (!ok) return;
+      var lines = ["TY  - JOUR"];
+      if (present(r.title)) lines.push("TI  - " + risEscape(r.title));
+      if (present(r.authors)) {
+        r.authors.split(/;\s*/).forEach(function (au) {
+          if (au.trim()) lines.push("AU  - " + risEscape(au.trim()));
+        });
+      }
+      if (present(r.year)) lines.push("PY  - " + present(r.year));
+      if (present(r.journal)) lines.push("JO  - " + risEscape(r.journal));
+      if (present(r.abstract)) lines.push("AB  - " + risEscape(r.abstract));
+      if (present(r.doi)) lines.push("DO  - " + present(r.doi));
+      if (present(r.pmid)) { lines.push("AN  - " + present(r.pmid)); lines.push("C2  - " + present(r.pmid)); }
+      if (present(r.record_id)) lines.push("ID  - " + present(r.record_id));
+      lines.push("ER  - ");
+      blocks.push(lines.join("\n"));
+    });
+    downloadBlob("includes.ris", blocks.join("\n") + (blocks.length ? "\n" : ""), "application/x-research-info-systems");
+  }
+
+  $("demo").addEventListener("click", function () {
+    $("inc").value = DEMO_INC;
+    $("exc").value = DEMO_EXC;
+    var csv = "id,title,authors,year,journal,pmid,doi,abstract\n" + DEMO_RECORDS.map(function (r) {
+      function q(s) { return '"' + String(s).replace(/"/g, '""') + '"'; }
+      return [r.record_id, r.title, r.authors, r.year, r.journal, r.pmid || "", r.doi || "", r.abstract].map(q).join(",");
+    }).join("\n");
+    $("paste").value = csv;
+    $("setup-msg").textContent = "Loaded " + DEMO_RECORDS.length + " synthetic sleep/caffeine records (2 duplicate pairs, 2 borderline A/B cases, 1 title-only). No real PMIDs.";
+    setEmptyState(false);
+  });
+
+  $("file").addEventListener("change", function (ev) {
+    var f = ev.target.files && ev.target.files[0];
+    if (!f) return;
+    var reader = new FileReader();
+    reader.onload = function () { $("paste").value = String(reader.result || ""); };
+    reader.readAsText(f);
+  });
+
+  $("progfile").addEventListener("change", function (ev) {
+    var f = ev.target.files && ev.target.files[0];
+    if (!f) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      try {
+        applyProgress(JSON.parse(String(reader.result || "")));
+        $("setup-msg").textContent = "Resumed from progress JSON (" + state.records.length + " records).";
+        setEmptyState(false);
+      } catch (err) {
+        $("setup-msg").textContent = "Could not read progress JSON: " + err.message;
+      }
+    };
+    reader.readAsText(f);
+  });
+
+  $("start").addEventListener("click", function () {
+    var inc = $("inc").value.trim();
+    var exc = $("exc").value.trim();
+    if (!inc && !exc) {
+      $("setup-msg").textContent = "Add at least one inclusion or exclusion line.";
+      return;
+    }
+    var recs = parsePaste($("paste").value);
+    if (!recs.length) {
+      $("setup-msg").textContent = "No records parsed. Paste CSV with a title column, or Title:/Abstract: blocks — or click Load synthetic demo.";
+      setEmptyState(true);
+      return;
+    }
+    recs.forEach(function (r) {
+      r.year = r.year || MISSING;
+      if (r.year === "") r.year = MISSING;
+    });
+    flagDups(recs);
+    var nDup = recs.filter(function (r) { return r.dup_flag === "yes"; }).length;
+    state.records = recs;
+    state.index = 0;
+    state.incP = phrases(inc);
+    state.excP = phrases(exc);
+    state.incText = inc;
+    state.excText = exc;
+    state.logs = { A: {}, B: {} };
+    state.screener = "A";
+    persist();
+    $("setup-msg").textContent = recs.length + " records, " + nDup + " flagged as duplicates (kept).";
+    setEmptyState(false);
+    render();
+  });
+
+  $("scr-a").addEventListener("click", function () { setScreener("A"); });
+  $("scr-b").addEventListener("click", function () { setScreener("B"); });
+  $("btn-logview").addEventListener("click", function () { saveDraft(); renderDone(); });
+  $("btn-include").addEventListener("click", function () { decide("include"); });
+  $("btn-maybe").addEventListener("click", function () { decide("maybe"); });
+  $("btn-exclude").addEventListener("click", function () { decide("exclude"); });
+  $("btn-prev").addEventListener("click", function () {
+    saveDraft();
+    if (state.index > 0) { state.index--; render(); }
+  });
+  $("btn-skip").addEventListener("click", function () {
+    saveDraft();
+    if (state.index < state.records.length - 1) { state.index++; render(); }
+    else renderDone();
+  });
+  $("dl-a").addEventListener("click", function () { downloadCSV("A"); });
+  $("dl-b").addEventListener("click", function () { downloadCSV("B"); });
+  $("dl-dis").addEventListener("click", downloadDisagreements);
+  $("dl-prisma").addEventListener("click", downloadPrismaMd);
+  $("dl-prisma-csv").addEventListener("click", downloadPrismaCsv);
+  $("dl-ris").addEventListener("click", downloadRIS);
+  $("dl-prog").addEventListener("click", downloadProgress);
+  $("back").addEventListener("click", function () {
+    var idx = 0;
+    for (var i = 0; i < state.records.length; i++) {
+      var s = slot(state.screener, state.records[i].record_id);
+      if (!s || !s.decision) { idx = i; break; }
+    }
+    state.index = idx;
+    render();
+  });
+  $("reset").addEventListener("click", function () { show("setup"); });
+
+  document.addEventListener("keydown", function (ev) {
+    if ($("screen").classList.contains("hidden")) return;
+    var tag = ev.target && ev.target.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA") return;
+    if (ev.key === "1" || ev.key === "i") { ev.preventDefault(); decide("include"); }
+    else if (ev.key === "2" || ev.key === "m") { ev.preventDefault(); decide("maybe"); }
+    else if (ev.key === "3" || ev.key === "x") { ev.preventDefault(); decide("exclude"); }
+    else if (ev.key === "j") { ev.preventDefault(); $("btn-skip").click(); }
+    else if (ev.key === "k") { ev.preventDefault(); $("btn-prev").click(); }
+  });
+})();
+</script>
+</body>
+</html>
