@@ -3,7 +3,13 @@
 **Title/abstract screening for systematic and scoping reviews.**  
 A Cursor/Claude skill plus a one-page static worksheet. Research ops, not care.
 
-v0.2.1 · MIT (skill files) · Polar listing live at 199 SEK.
+**Install (no account, no build step)**
+
+- Try it in the browser: https://andreaslofberg.github.io/screened/
+- Cursor Directory: https://cursor.directory/plugins/screened
+- Copy `skills/screened/` (Directory path) or `skill/screened/` (same files) into `.cursor/skills/screened/`.
+
+v0.2.1 · MIT · [Cursor Directory](https://cursor.directory/plugins/screened) · optional Polar zip.
 
 ## What it is
 
@@ -61,7 +67,8 @@ LICENSE                   MIT + note that the Polar listing is paid
 NOTICE.md                 not-clinical / AI vs human / dual screening
 companion/index.html      static worksheet (open as a file)
 examples/                 12 synthetic “sleep and caffeine” records + dual decisions
-skill/screened/           Cursor / Claude skill
+skills/screened/          Cursor / Claude skill (Directory auto-detect path)
+skill/screened/           same files, original path
   SKILL.md
   scripts/parse_records.py
   scripts/dedup_records.py
@@ -77,7 +84,10 @@ skill/screened/           Cursor / Claude skill
 
 ## Install the skill (Cursor)
 
-1. Copy the folder `skill/screened/` to one of:
+The skill files ship twice in this repo: `skills/screened/` (the path Cursor
+Directory auto-detects) and `skill/screened/`. They are duplicates — use either.
+
+1. Copy the folder `skills/screened/` (or `skill/screened/`) to one of:
    - project: `.cursor/skills/screened/`
    - user: `~/.cursor/skills/screened/`
 2. Restart Agent chat, or type `/screened`.
@@ -168,7 +178,10 @@ disagreements CSV, PRISMA markdown/CSV, progress JSON (resume), and includes RIS
 Later it can sit on Cloudflare Pages as a static site. This v0 does not require
 an account anywhere.
 
-## Polar listing copy (draft — not published)
+## Optional paid zip (Polar)
+
+The Polar listing is live, but GitHub, Cursor Directory, and the hosted demo are
+the free path — the paid zip is just a packaged copy of these same MIT files.
 
 **Title:** Screened — dual-screener title/abstract logs (Cursor skill + offline worksheet)
 
