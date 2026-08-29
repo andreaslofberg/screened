@@ -156,7 +156,8 @@
         <p class="hint" id="empty-hint">Demo papers are obviously fake (“sleep and caffeine”, marked [SYNTHETIC]), including two duplicate pairs and two borderline records for A/B disagreement. No patient data. Companion is for a few dozen records; use the Cursor skill for a full export.</p>
         <div id="empty-state" class="banner" style="margin-top:12px" role="status">
           <strong>Nothing loaded yet.</strong>
-          First time? Click <strong>Load synthetic demo</strong> (offline <code>file://</code>, no network), then <strong>Start screening</strong>.
+          On the hosted demo, synthetic records load automatically so you can screen with keys <strong>1 / 2 / 3</strong>.
+          Offline <code>file://</code>: click <strong>Load synthetic demo</strong>, then <strong>Start screening</strong>.
           Or paste / load your own CSV. Include = retrieve full text — you still decide every row.
         </div>
       </div>
@@ -1044,7 +1045,7 @@
     downloadBlob("includes.ris", blocks.join("\n") + (blocks.length ? "\n" : ""), "application/x-research-info-systems");
   }
 
-  $("demo").addEventListener("click", function () {
+  function loadSyntheticDemo() {
     $("inc").value = DEMO_INC;
     $("exc").value = DEMO_EXC;
     var csv = "id,title,authors,year,journal,pmid,doi,abstract\n" + DEMO_RECORDS.map(function (r) {
@@ -1052,9 +1053,10 @@
       return [r.record_id, r.title, r.authors, r.year, r.journal, r.pmid || "", r.doi || "", r.abstract].map(q).join(",");
     }).join("\n");
     $("paste").value = csv;
-    $("setup-msg").textContent = "Loaded " + DEMO_RECORDS.length + " synthetic sleep/caffeine records (2 duplicate pairs, 2 borderline A/B cases, 1 title-only). No real PMIDs.";
+    $("setup-msg").textContent = "Loaded " + DEMO_RECORDS.length + " synthetic sleep/caffeine records (2 duplicate pairs, 2 borderline A/B cases, 1 title-only). No real PMIDs. Keys 1 / 2 / 3 to screen.";
     setEmptyState(false);
-  });
+  }
+  $("demo").addEventListener("click", loadSyntheticDemo);
 
   $("file").addEventListener("change", function (ev) {
     var f = ev.target.files && ev.target.files[0];
@@ -1156,6 +1158,13 @@
     else if (ev.key === "j") { ev.preventDefault(); $("btn-skip").click(); }
     else if (ev.key === "k") { ev.preventDefault(); $("btn-prev").click(); }
   });
+
+  /* Hosted demo (GitHub Pages) and ?demo=1: land in a tryable screening, not an empty form. file:// stays opt-in. */
+  var wantDemo = location.protocol === "https:" || /(?:^|[?&])demo=1(?:&|$)/.test(location.search) || location.hash === "#demo";
+  if (wantDemo) {
+    loadSyntheticDemo();
+    $("start").click();
+  }
 })();
 </script>
 </body>
